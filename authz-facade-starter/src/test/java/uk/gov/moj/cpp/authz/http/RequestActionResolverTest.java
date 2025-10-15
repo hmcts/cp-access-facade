@@ -1,171 +1,184 @@
 package uk.gov.moj.cpp.authz.http;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class RequestActionResolverTest {
 
-    private static final String ACTION_HEADER = "CPP-ACTION";
-    private static final String PATH_SAMPLE = "/some/path";
+    private static final String MEDIA_SJP_DELETE_FINANCIAL_MEANS =
+            "application/vnd.sjp.delete-financial-means+json";
+    private static final String MEDIA_HEARING_GET_DRAFT_RESULT =
+            "application/vnd.hearing.get-draft-result+json";
+    private static final String MEDIA_JSON = "application/json";
+
+    private static final String HEADER_CPP_ACTION = "CPP-ACTION";
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final String HEADER_ACCEPT = "Accept";
+
+    private static final String PATH_HELLO = "/api/hello";
     private static final String METHOD_GET = "GET";
-    private static final String METHOD_POST = "POST";
-    private static final String VENDOR_SJP_DELETE = "sjp.delete-financial-means";
-    private static final String VENDOR_HEARING_DRAFT = "hearing.get-draft-result";
-
-    // --- extractVendorAction -------------------------------------------------
+    private static final String COMPUTED_GET_HELLO = "GET /api/hello";
 
     @Test
-    void extractVendorAction_fromContentTypeWithSuffix() {
-        final String input = "application/vnd.sjp.delete-financial-means+json";
-        final String found = RequestActionResolver.extractVendorAction(input);
-        assertEquals(VENDOR_SJP_DELETE, found, "Should extract vendor token from Content-Type");
+    void extractVendorActionFromContentTypeWithSuffix() {
+        final String token = RequestActionResolver.extractVendorAction(MEDIA_SJP_DELETE_FINANCIAL_MEANS);
+        assertEquals("sjp.delete-financial-means", token, "Should parse vendor token with +json suffix");
     }
 
     @Test
-    void extractVendorAction_caseInsensitiveLowerCased() {
-        final String input = "APPLICATION/VND.SJP.DELETE-FINANCIAL-MEANS+JSON";
-        final String found = RequestActionResolver.extractVendorAction(input);
-        assertEquals(VENDOR_SJP_DELETE, found, "Should normalize token to lowercase");
+    void extractVendorActionIsCaseInsensitiveAndLowerCased() {
+        final String weirdCasing = "Application/VnD.HeArInG.GeT-DrAfT-ReSuLt+Json";
+        final String token = RequestActionResolver.extractVendorAction(weirdCasing);
+        assertEquals("hearing.get-draft-result", token, "Should lower-case and match case-insensitively");
     }
 
     @Test
-    void extractVendorAction_returnsNullWhenNoVendor() {
-        final String input = "application/json";
-        final String found = RequestActionResolver.extractVendorAction(input);
-        assertEquals(null, found, "Should return null when no vendor token present");
-    }
-
-    // --- extractFirstVendorFromHeaderList (Accept) ---------------------------
-
-    @Test
-    void extractFirstVendorFromHeaderList_picksFirstVendorLeftToRight() {
-        final String header = "application/json, application/vnd.hearing.get-draft-result+json;q=0.9, application/vnd.other+json";
-        final String found = RequestActionResolver.extractFirstVendorFromHeaderList(header);
-        assertEquals(VENDOR_HEARING_DRAFT, found, "Should pick first vendor token from Accept");
+    void extractVendorActionReturnsNullWhenNoVendor() {
+        final String token = RequestActionResolver.extractVendorAction(MEDIA_JSON);
+        assertNull(token, "No vendor token should be found in non-vendor media type");
     }
 
     @Test
-    void extractFirstVendorFromHeaderList_returnsNullWhenNoVendor() {
-        final String header = "application/json, text/plain;q=0.5";
-        final String found = RequestActionResolver.extractFirstVendorFromHeaderList(header);
-        assertEquals(null, found, "Should return null when Accept has no vendor tokens");
-    }
-
-    // --- resolve() priority: Content-Type > Accept > Header > Computed -------
-
-    @Test
-    void resolve_prefersContentTypeOverHeaderAndComputed_name() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_POST, PATH_SAMPLE);
-        req.addHeader("Content-Type", "application/vnd.sjp.delete-financial-means+json");
-        req.addHeader(ACTION_HEADER, "POST /ignored/by/content-type");
-
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
-
-        assertEquals(VENDOR_SJP_DELETE, ra.name(), "Content-Type vendor token must win");
+    void extractFirstVendorFromHeaderListPicksFirstLeftToRight() {
+        final String acceptHeader = "text/html, " + MEDIA_HEARING_GET_DRAFT_RESULT + ", " + MEDIA_SJP_DELETE_FINANCIAL_MEANS;
+        final String token = RequestActionResolver.extractFirstVendorFromHeaderList(acceptHeader);
+        assertEquals("hearing.get-draft-result", token, "Should pick the first vendor token left-to-right");
     }
 
     @Test
-    void resolve_acceptUsedWhenNoContentTypeVendor_name() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
-        req.addHeader("Accept", "application/json, application/vnd.hearing.get-draft-result+json");
-
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
-
-        assertEquals(VENDOR_HEARING_DRAFT, ra.name(), "Accept vendor token must be used when no Content-Type token");
+    void extractFirstVendorFromHeaderListReturnsNullWhenNoVendor() {
+        final String acceptHeader = "text/html, " + MEDIA_JSON;
+        final String token = RequestActionResolver.extractFirstVendorFromHeaderList(acceptHeader);
+        assertNull(token, "Should return null when no vendor media types present");
     }
 
     @Test
-    void resolve_usesExplicitHeaderWhenNoVendor_name() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
-        req.addHeader(ACTION_HEADER, "GET /explicit");
+    void resolvesPrefersContentTypeOverHeaderAndComputedName() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_CONTENT_TYPE, MEDIA_HEARING_GET_DRAFT_RESULT);
+        request.addHeader(HEADER_CPP_ACTION, COMPUTED_GET_HELLO);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals("GET /explicit", ra.name(), "Header-based action must be used when no vendor tokens");
+        assertEquals("hearing.get-draft-result", resolved.name(), "Content-Type vendor should win");
     }
 
     @Test
-    void resolve_computedWhenNoVendorOrHeader_name() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
+    void resolvesHeaderFlagFalseWhenContentTypeWins() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_CONTENT_TYPE, MEDIA_HEARING_GET_DRAFT_RESULT);
+        request.addHeader(HEADER_CPP_ACTION, COMPUTED_GET_HELLO);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals(METHOD_GET + " " + PATH_SAMPLE, ra.name(), "Computed action must be method + path");
-    }
-
-    // --- resolve() flags -----------------------------------------------------
-
-    @Test
-    void resolve_flags_vendorSuppliedTrueWhenFromContentType() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_POST, PATH_SAMPLE);
-        req.addHeader("Content-Type", "application/vnd.sjp.delete-financial-means+json");
-
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
-
-        assertEquals(true, ra.vendorSupplied(), "vendorSupplied must be true when resolved from vendor media");
+        assertFalse(resolved.headerSupplied(), "Header flag should be false when Content-Type wins");
     }
 
     @Test
-    void resolve_flags_headerSuppliedFalseWhenFromVendor() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_POST, PATH_SAMPLE);
-        req.addHeader("Content-Type", "application/vnd.sjp.delete-financial-means+json");
-        req.addHeader(ACTION_HEADER, "POST /ignored");
+    void resolvesVendorSuppliedTrueWhenFromContentType() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_CONTENT_TYPE, MEDIA_SJP_DELETE_FINANCIAL_MEANS);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals(false, ra.headerSupplied(), "headerSupplied must be false when vendor wins");
+        assertTrue(resolved.vendorSupplied(), "Vendor flag should be true when resolved from Content-Type");
     }
 
     @Test
-    void resolve_flags_vendorSuppliedTrueWhenFromAccept() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
-        req.addHeader("Accept", "application/vnd.hearing.get-draft-result+json");
+    void resolvesAcceptUsedWhenNoContentTypeVendorName() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_ACCEPT, MEDIA_SJP_DELETE_FINANCIAL_MEANS);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals(true, ra.vendorSupplied(), "vendorSupplied must be true when resolved from Accept");
+        assertEquals("sjp.delete-financial-means", resolved.name(), "Should resolve from Accept when no Content-Type vendor");
     }
 
     @Test
-    void resolve_flags_headerSuppliedTrueWhenFromHeader() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
-        req.addHeader(ACTION_HEADER, "GET /from-header");
+    void resolvesVendorSuppliedTrueWhenFromAccept() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_ACCEPT, MEDIA_HEARING_GET_DRAFT_RESULT);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals(true, ra.headerSupplied(), "headerSupplied must be true when resolved from header");
+        assertTrue(resolved.vendorSupplied(), "Vendor flag should be true when resolved from Accept");
     }
 
     @Test
-    void resolve_flags_vendorAndHeaderFalseWhenComputed() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
+    void resolvesUsesExplicitHeaderWhenNoVendorPresentName() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_CPP_ACTION, COMPUTED_GET_HELLO);
+        request.addHeader(HEADER_CONTENT_TYPE, MEDIA_JSON);
+        request.addHeader(HEADER_ACCEPT, MEDIA_JSON);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, ACTION_HEADER, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals(false, ra.vendorSupplied() || ra.headerSupplied(),
-                "Both flags must be false when using computed action");
+        assertEquals(COMPUTED_GET_HELLO, resolved.name(), "Should use explicit header when no vendor present");
     }
 
-    // --- null-safety ---------------------------------------------------------
+    @Test
+    void resolvesHeaderSuppliedTrueWhenExplicitHeaderPresent() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_CPP_ACTION, COMPUTED_GET_HELLO);
+
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
+
+        assertTrue(resolved.headerSupplied(), "Header flag should be true when explicit header used");
+    }
 
     @Test
-    void resolve_handlesNullActionHeaderName() {
-        final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_GET, PATH_SAMPLE);
+    void resolvesComputedWhenNoVendorOrHeaderName() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        request.addHeader(HEADER_CONTENT_TYPE, MEDIA_JSON);
+        request.addHeader(HEADER_ACCEPT, MEDIA_JSON);
 
-        final RequestActionResolver.ResolvedAction ra =
-                RequestActionResolver.resolve(req, null, PATH_SAMPLE);
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
 
-        assertEquals(METHOD_GET + " " + PATH_SAMPLE, ra.name(), "Should compute action when header name is null");
+        assertEquals(COMPUTED_GET_HELLO, resolved.name(), "Should compute '<METHOD> <PATH>' when no vendor/header");
+    }
+
+    @Test
+    void resolvesVendorFlagFalseWhenComputed() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
+
+        assertFalse(resolved.vendorSupplied(), "Vendor flag should be false when computed");
+    }
+
+    @Test
+    void resolvesHeaderFlagFalseWhenComputed() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, HEADER_CPP_ACTION, PATH_HELLO);
+
+        assertFalse(resolved.headerSupplied(), "Header flag should be false when computed");
+    }
+
+    @Test
+    void resolveHandlesNullActionHeaderName() {
+        final MockHttpServletRequest request = new MockHttpServletRequest(METHOD_GET, PATH_HELLO);
+        // If header name is null, resolver must ignore any physical header present.
+        request.addHeader(HEADER_CPP_ACTION, COMPUTED_GET_HELLO);
+
+        final RequestActionResolver.ResolvedAction resolved =
+                RequestActionResolver.resolve(request, null, PATH_HELLO);
+
+        assertEquals(COMPUTED_GET_HELLO, resolved.name(), "Should compute '<METHOD> <PATH>' with null header name");
     }
 }
