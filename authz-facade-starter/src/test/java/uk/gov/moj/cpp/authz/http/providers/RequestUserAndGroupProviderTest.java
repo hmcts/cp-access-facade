@@ -1,13 +1,12 @@
 package uk.gov.moj.cpp.authz.http.providers;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import uk.gov.moj.cpp.authz.drools.Action;
 import uk.gov.moj.cpp.authz.http.AuthzPrincipal;
+
+import java.util.Map;
+import java.util.Set;
 
 class RequestUserAndGroupProviderTest {
 

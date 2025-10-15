@@ -1,10 +1,5 @@
 package uk.gov.moj.cpp.authz.drools;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -12,6 +7,12 @@ import uk.gov.moj.cpp.authz.http.AuthzPrincipal;
 import uk.gov.moj.cpp.authz.http.config.HttpAuthzProperties;
 import uk.gov.moj.cpp.authz.http.providers.UserAndGroupProvider;
 import uk.gov.moj.cpp.authz.testsupport.TestConstants;
+
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DroolsAuthzEngineTest {
 

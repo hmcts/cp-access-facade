@@ -1,16 +1,8 @@
 package uk.gov.moj.cpp.authz.http;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 import uk.gov.moj.cpp.authz.drools.Action;
@@ -18,6 +10,11 @@ import uk.gov.moj.cpp.authz.drools.DroolsAuthzEngine;
 import uk.gov.moj.cpp.authz.http.RequestActionResolver.ResolvedAction;
 import uk.gov.moj.cpp.authz.http.config.HttpAuthzProperties;
 import uk.gov.moj.cpp.authz.http.providers.RequestUserAndGroupProvider;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public final class HttpAuthzFilter implements Filter {
     private final HttpAuthzProperties properties;

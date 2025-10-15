@@ -1,33 +1,77 @@
-gradle
+###############################
+# Gradle & Build Artifacts #
+###############################
+
+# Ignore all build directories recursively
+**/build/
+**/.gradle/
+
+# Gradle wrapper files (keep properties file only)
+gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.properties
+
+# Gradlew scripts (ignore binaries, keep docker helper)
+gradlew
+gradlew.bat
 bin/*
 !bin/run-in-docker.sh
-.gradle
-/build/
-/gradlew
-/gradlew.bat
-!gradle/wrapper/gradle-wrapper.properties
-*.class
-bin/main/application.yaml
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
+########################
+# IDE Configurations #
+########################
 
 ### IntelliJ IDEA ###
-.idea
-/out
+.idea/
 *.iws
 *.iml
 *.ipr
+/out/
 
-.DS_Store
+### Eclipse / Spring Tool Suite (STS) ###
+.classpath
+.project
+.settings/
+.apt_generated/
+.factorypath/
+.springBeans/
 
-applicationinsights-agent-*.jar
-*.log
+######################
+#  System / Logs   #
+######################
 
+# macOS Finder metadata
 .DS_Store
 */.DS_Store
+
+# Logs & temp
+*.log
+*.tmp
+*.swp
+
+# Compiled classes
+*.class
+
+#############################
+#  Application Artifacts  #
+#############################
+
+# Application Insight agent jars
+applicationinsights-agent-*.jar
+
+# Application config generated under bin/
+bin/main/application.yaml
+
+#############################
+#  Other Useful Ignores   #
+#############################
+
+# VS Code
+.vscode/
+
+# JetBrains HTTP Client
+.http/
+
+# OS junk files
+Thumbs.db
+ehthumbs.db
+desktop.ini
