@@ -1,0 +1,110 @@
+plugins {
+    id 'org.springframework.boot' version '4.0.0-M3' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+
+
+    id 'jacoco'
+    id 'pmd'
+    id 'maven-publish'
+
+    id 'com.github.ben-manes.versions' version '0.53.0'
+    id 'org.cyclonedx.bom' version '2.4.1'
+    id 'au.com.dius.pact' version '4.6.17'
+    id 'com.gorylenko.gradle-git-properties' version '2.5.3'
+}
+
+group   = 'uk.gov.moj.cpp'
+version = System.getProperty('ARTEFACT_VERSION') ?: '0.0.1-SNAPSHOT'
+ext {
+    lombokVersion = "1.18.42"
+    apiSpecVersion = "0.4.2"
+    testcontainersBom = "1.20.1"
+    cdk = "0.0.4-02dc81b"
+    mapstruct = "1.5.5.Final"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = "https://repo.spring.io/milestone" }
+    maven { url = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'jacoco'
+    apply plugin: 'pmd'
+
+    java {
+        toolchain { languageVersion = JavaLanguageVersion.of(21) }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release  = 21
+        options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat = 'full'
+            showStandardStreams = true
+        }
+    }
+
+    jacoco { toolVersion = "0.8.12" }
+
+    pmd {
+        ruleSets = []
+        ruleSetFiles = files("$rootDir/.github/pmd-ruleset.xml")
+        ignoreFailures = false
+    }
+
+    cyclonedxBom {
+        includeConfigs = ["runtimeClasspath"]
+        schemaVersion = "1.6"
+        componentVersion = providers.provider { project.version.toString() }
+        destination = layout.buildDirectory.dir("reports").get().asFile
+    }
+
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder  = true
+    }
+
+    // Publish only libraries (demo excluded later)
+    plugins.withId('maven-publish') {
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                    pom {
+                        name        = project.name
+                        description = "CPP Access Facade Module"
+                        url         = "https://github.com/moj-projects/cp-access-facade"
+                    }
+                }
+            }
+            repositories {
+                mavenLocal()
+            }
+        }
+    }
+}
+
+// Aggregated helper task
+tasks.register('buildAll') {
+    dependsOn(
+            ':authz-facade-starter:build',
+            ':audit-facade-starter:build',
+            ':access-facade-demo-service:build'
+    )
+}
+
+gradle.taskGraph.whenReady { graph ->
+    println '\n📦 Building modules:'
+    graph.allTasks.collect { it.project.name }.unique().sort().each { println "   - $it" }
+}

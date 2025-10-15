@@ -1,0 +1,62 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'java-library'
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+dependencies {
+    // --- Spring Boot Core / Autoconfigure ---
+    api 'org.springframework.boot:spring-boot-autoconfigure'
+    api 'org.springframework.boot:spring-boot-starter-web'
+
+    // --- Core libraries ---
+    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'io.micrometer:micrometer-core'
+
+    // --- Spring configuration metadata processor ---
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // --- Lombok for main and test code ---
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    // --- Drools / MVEL rule engine ---
+    implementation 'org.kie:kie-api:7.74.0.Final'
+    implementation 'org.drools:drools-core:7.74.0.Final'
+    implementation 'org.drools:drools-compiler:7.74.0.Final'
+    implementation 'org.drools:drools-mvel:7.74.0.Final'
+    implementation 'org.mvel:mvel2:2.5.0.Final'
+
+    // --- Testing (JUnit 5) ---
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.test {
+    useJUnitPlatform()
+    // Drools pulls MVEL; on JDK 21 keep JIT off to avoid edge cases
+    jvmArgs '-Dmvel2.disable.jit=true'
+
+    // Prevent JaCoCo from instrumenting Drools/ANTLR/MVEL classes (they contain huge methods)
+    jacoco {
+        excludes = [
+                'org/drools/**',
+                'org/kie/**',
+                'org/antlr/**',
+                'org/mvel/**'
+        ]
+        // Alternatively, only instrument your code:
+        // includes = ['uk/gov/moj/**']
+    }
+}
+
+bootJar { enabled = false }
+jar {
+    enabled = true
+    archiveClassifier.set('')
+}

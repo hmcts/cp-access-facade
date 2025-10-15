@@ -1,0 +1,2 @@
+uk.gov.moj.cpp.audit.config.AuditAutoConfiguration
+uk.gov.moj.cpp.authz.http.config.AuthzAutoConfiguration
