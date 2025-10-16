@@ -12,19 +12,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class PathParameterValueExtractor {
 
-    public Map<String, String> extractPathParameters(String path, String regex, List<String> parameterNames) {
+    public Map<String, String> extractPathParameters(final String path, final String regex, final List<String> parameterNames) {
         if (path == null) {
             return Map.of();
         }
 
-        Matcher matcher = compile(regex).matcher(path);
+        final Matcher matcher = compile(regex).matcher(path);
         if (!matcher.matches()) {
             return Map.of();
         }
 
-        Map<String, String> parameters = new HashMap<>();
+        final Map<String, String> parameters = new HashMap<>();
         int index = 1;
-        for (String name : parameterNames) {
+        for (final String name : parameterNames) {
             parameters.put(name, matcher.group(index++));
         }
         return parameters;

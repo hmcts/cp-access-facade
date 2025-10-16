@@ -28,6 +28,9 @@ import org.springframework.core.io.Resource;
 
 class OpenApiSpecificationParserTest {
 
+    private static final String CLASSPATH_OPENAPI_YAML = "classpath:/openapi.yaml";
+    private static final String FILE_DUMMY_PATH = "file:/dummy/path";
+
     @Test
     @DisplayName("Throws exception when OpenAPI specification path is null")
     void throwsExceptionWhenOpenApiSpecPathIsNull() {
@@ -48,7 +51,7 @@ class OpenApiSpecificationParserTest {
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.empty());
         final OpenAPIParser openAPIParser = mock(OpenAPIParser.class);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
 
         assertThatThrownBy(parser::init)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -64,7 +67,7 @@ class OpenApiSpecificationParserTest {
         when(resource.getURL()).thenThrow(new IOException("IO error"));
         OpenAPIParser openAPIParser = mock(OpenAPIParser.class);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
 
         assertThatThrownBy(parser::init)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -77,7 +80,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final OpenAPI openAPI = mock(OpenAPI.class);
         when(openAPI.getPaths()).thenReturn(null);
@@ -87,7 +90,7 @@ class OpenApiSpecificationParserTest {
         result.setOpenAPI(openAPI);
         when(openAPIParser.readLocation(anyString(), isNull(), isNull())).thenReturn(result);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
 
         assertThatThrownBy(parser::init)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -100,7 +103,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final Parameter pathParam = new Parameter().in("path").name("id");
         final PathItem pathItem1 = new PathItem().parameters(List.of(pathParam));
@@ -117,7 +120,7 @@ class OpenApiSpecificationParserTest {
         result.setOpenAPI(openAPI);
         when(openAPIParser.readLocation(anyString(), isNull(), isNull())).thenReturn(result);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
         parser.init();
 
         final Map<String, Pattern> patterns = parser.getPathPatterns();
@@ -133,7 +136,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final Parameter queryParam = new Parameter().in("query").name("q");
         final PathItem pathItem = new PathItem().parameters(List.of(queryParam));
@@ -148,7 +151,7 @@ class OpenApiSpecificationParserTest {
         result.setOpenAPI(openAPI);
         when(openAPIParser.readLocation(anyString(), isNull(), isNull())).thenReturn(result);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
         parser.init();
 
         assertThat(parser.getPathPatterns()).isEmpty();
@@ -160,7 +163,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final PathItem pathItem = new PathItem().parameters(null);
         final Paths paths = new Paths();
@@ -174,7 +177,7 @@ class OpenApiSpecificationParserTest {
         result.setOpenAPI(openAPI);
         when(openAPIParser.readLocation(anyString(), isNull(), isNull())).thenReturn(result);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
         parser.init();
 
         assertThat(parser.getPathPatterns()).isEmpty();
@@ -186,7 +189,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final Parameter pathParam1 = new Parameter().in("path").name("id");
         final Parameter pathParam2 = new Parameter().in("path").name("subId");
@@ -202,7 +205,7 @@ class OpenApiSpecificationParserTest {
         result.setOpenAPI(openAPI);
         when(openAPIParser.readLocation(anyString(), isNull(), isNull())).thenReturn(result);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
         parser.init();
 
         final Map<String, Pattern> patterns = parser.getPathPatterns();
@@ -216,7 +219,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final Paths paths = new Paths();
         paths.addPathItem("/api/resource/{id}", null);
@@ -241,7 +244,7 @@ class OpenApiSpecificationParserTest {
         final ClasspathResourceLoader resourceLoader = mock(ClasspathResourceLoader.class);
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
-        when(resource.getURL()).thenReturn(new URL("file:/dummy/path"));
+        when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final Parameter pathParam = new Parameter().in("path").name("id");
         final Parameter queryParam = new Parameter().in("query").name("q");
@@ -257,7 +260,7 @@ class OpenApiSpecificationParserTest {
         result.setOpenAPI(openAPI);
         when(openAPIParser.readLocation(anyString(), isNull(), isNull())).thenReturn(result);
 
-        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, "classpath:/openapi.yaml", openAPIParser);
+        final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
         parser.init();
 
         final Map<String, Pattern> patterns = parser.getPathPatterns();

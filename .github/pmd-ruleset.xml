@@ -18,6 +18,7 @@
         <exclude name="CallSuperInConstructor"/>
         <exclude name="LongVariable"/>
         <exclude name="TooManyStaticImports"/>
+        <exclude name="OnlyOneReturn"/>
     </rule>
     <rule ref="category/java/errorprone.xml">
         <exclude name="InvalidLogMessageFormat"/>

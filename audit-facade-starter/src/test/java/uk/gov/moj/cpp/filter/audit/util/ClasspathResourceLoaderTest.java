@@ -30,7 +30,7 @@ class ClasspathResourceLoaderTest {
 
         assertTrue(result.isPresent(), "Resource should be found on the classpath.");
 
-        assertTrue(result.get().getFilename().equalsIgnoreCase("test-res.txt"), "The found resource should be the expected file.");
+        assertTrue("test-res.txt".equalsIgnoreCase(result.get().getFilename()), "The found resource should be the expected file.");
     }
 
     @Test
@@ -41,18 +41,18 @@ class ClasspathResourceLoaderTest {
 
         assertTrue(result.isPresent(), "Resource should be found on the classpath.");
 
-        assertTrue(result.get().getFilename().equalsIgnoreCase("nested-test-resource.txt"), "The found resource should be the expected file.");
+        assertTrue("nested-test-resource.txt".equalsIgnoreCase(result.get().getFilename()), "The found resource should be the expected file.");
     }
 
     @Test
     void shouldFindFileFilesByFullNameSuccessfully() {
         final String pattern = "nested-test-resource.txt";
 
-        Optional<Resource> result = resourceLoader.loadFilesByPattern(pattern);
+        final Optional<Resource> result = resourceLoader.loadFilesByPattern(pattern);
 
         assertTrue(result.isPresent(), "Resource should be found on the classpath.");
 
-        assertTrue(result.get().getFilename().equalsIgnoreCase("nested-test-resource.txt"), "The found resource should be the expected file.");
+        assertTrue("nested-test-resource.txt".equalsIgnoreCase(result.get().getFilename()), "The found resource should be the expected file.");
     }
 
     /**
@@ -62,7 +62,7 @@ class ClasspathResourceLoaderTest {
     void shouldReturnEmptyWhenNoMatch() {
         final String pattern = "nonexistent-file-123.yaml";
 
-        Optional<Resource> result = resourceLoader.loadFilesByPattern(pattern);
+        final Optional<Resource> result = resourceLoader.loadFilesByPattern(pattern);
 
         assertTrue(result.isEmpty(), "Result should be empty when no resource matches the pattern.");
     }
@@ -70,7 +70,7 @@ class ClasspathResourceLoaderTest {
     @Configuration
     static class TestConfig {
         @Bean
-        public ClasspathResourceLoader classpathResourceLoader(ResourceLoader resourceLoader) {
+        public ClasspathResourceLoader classpathResourceLoader(final ResourceLoader resourceLoader) {
             return new ClasspathResourceLoader(resourceLoader);
         }
     }

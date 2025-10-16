@@ -19,9 +19,9 @@ public class ClasspathResourceLoader {
 
     public Optional<Resource> loadFilesByPattern(final String resourcePattern) {
         try {
-            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+            final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
 
-            Resource[] resources = resolver.getResources("classpath*:**/*" + resourcePattern);
+            final Resource[] resources = resolver.getResources("classpath*:**/*" + resourcePattern);
 
             LOGGER.info("Found {} files matching pattern {}", resources.length, resourcePattern);
 

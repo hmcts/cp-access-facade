@@ -47,11 +47,11 @@ public class AuditPayloadGenerationService {
     }
 
     private ObjectNode constructPayloadWithMetadata(final String rawJsonString, final Map<String, String> headers, final Map<String, String> queryParams, final Map<String, String> pathParams) {
-        Metadata metadata = generateMetadata(headers);
+        final Metadata metadata = generateMetadata(headers);
 
         try {
             final JsonNode node = objectMapper.readTree(rawJsonString);
-            ObjectNode objectNode = createObjectNode(node, rawJsonString);
+            final ObjectNode objectNode = createObjectNode(node, rawJsonString);
 
             if (isNotEmpty(queryParams)) {
                 queryParams.forEach((key, value) -> objectNode.set(key, objectMapper.convertValue(value, JsonNode.class)));
@@ -101,7 +101,7 @@ public class AuditPayloadGenerationService {
         return metadataBuilder.build();
     }
 
-    private void setOptionalMetadata(Map<String, String> headers, Metadata.MetadataBuilder metadataBuilder) {
+    private void setOptionalMetadata(final Map<String, String> headers, final Metadata.MetadataBuilder metadataBuilder) {
         final String userId = getHeaderMatchingKey(headers, HEADER_USER_ID);
         final String clientCorrelationId = getHeaderMatchingKey(headers, HEADER_CLIENT_CORRELATION_ID);
 
@@ -113,13 +113,13 @@ public class AuditPayloadGenerationService {
         }
     }
 
-    private String getHeaderMatchingKey(final Map<String, String> headers, String... keys) {
-        for (String searchKey : keys) {
+    private String getHeaderMatchingKey(final Map<String, String> headers, final String... keys) {
+        for (final String searchKey : keys) {
             if (StringUtils.isBlank(searchKey)) {
                 continue;
             }
 
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
+            for (final Map.Entry<String, String> entry : headers.entrySet()) {
                 if (entry.getKey() != null && entry.getKey().trim().equalsIgnoreCase(searchKey.trim())) {
                     return entry.getValue();
                 }
@@ -129,8 +129,8 @@ public class AuditPayloadGenerationService {
         return null;
     }
 
-    private ObjectNode createPayloadWithMetadata(String rawJsonString, Metadata metadata) {
-        ObjectNode objectNode = objectMapper.createObjectNode();
+    private ObjectNode createPayloadWithMetadata(final String rawJsonString, final Metadata metadata) {
+        final ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put(ATTRIBUTE_PAYLOAD_KEY, rawJsonString);
         addMetadataToNode(metadata, objectNode);
         return objectNode;
