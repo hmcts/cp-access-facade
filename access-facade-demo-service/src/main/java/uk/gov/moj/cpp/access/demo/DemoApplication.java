@@ -7,7 +7,7 @@ import org.springframework.jms.annotation.EnableJms;
 @EnableJms
 @SpringBootApplication
 public class DemoApplication {
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(DemoApplication.class, args);
     }
 }

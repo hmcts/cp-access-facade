@@ -10,12 +10,12 @@ import java.util.Map;
 public class EchoController {
 
     @GetMapping("/hello")
-    public Map<String, String> hello(@RequestParam(defaultValue = "world") String name) {
+    public Map<String, String> hello(@RequestParam(defaultValue = "world") final String name) {
         return Map.of("message", "hello " + name);
     }
 
     @PostMapping("/echo")
-    public ResponseEntity<?> echo(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> echo(@RequestBody final Map<String, Object> body) {
         return ResponseEntity.ok(Map.of("received", body));
     }
 

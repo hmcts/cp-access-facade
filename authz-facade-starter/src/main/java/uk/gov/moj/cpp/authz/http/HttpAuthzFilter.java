@@ -56,10 +56,7 @@ public final class HttpAuthzFilter implements Filter {
             invokeChain = true;
         } else {
             final String userId = httpRequest.getHeader(properties.getUserIdHeader());
-            if (!StringUtils.hasText(userId)) {
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                        "Missing header: " + properties.getUserIdHeader());
-            } else {
+            if (StringUtils.hasText(userId)) {
                 final ResolvedAction resolved =
                         RequestActionResolver.resolve(httpRequest, properties.getActionHeader(), pathWithinApplication);
 
@@ -88,6 +85,12 @@ public final class HttpAuthzFilter implements Filter {
                         httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                     }
                 }
+
+            } else {
+
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                        "Missing header: " + properties.getUserIdHeader());
+
             }
         }
 

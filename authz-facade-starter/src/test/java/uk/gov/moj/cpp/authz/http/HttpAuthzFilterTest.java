@@ -278,7 +278,7 @@ class HttpAuthzFilterTest {
     }
 
     @Test
-    void resolvesActionFromContentType_vendorWinsOverHeader() throws Exception {
+    void resolvesActionFromContentTypeVendorWinsOverHeader() throws Exception {
         final MockHttpServletRequest req = new MockHttpServletRequest(METHOD_POST, "/sjp/anything");
         req.addHeader(USER_ID_HEADER, USER_123);
         req.addHeader("Content-Type", "application/vnd.sjp.delete-financial-means+json");
@@ -319,7 +319,7 @@ class HttpAuthzFilterTest {
     }
 
     private static IdentityResponse mockIdentity(final String userId) {
-        final IdentityResponse identity = org.mockito.Mockito.mock(IdentityResponse.class);
+        final IdentityResponse identity = mock(IdentityResponse.class);
         when(identity.userId()).thenReturn(userId);
         return identity;
     }
