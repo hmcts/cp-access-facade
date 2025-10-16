@@ -14,7 +14,7 @@ import java.net.URI;
 import java.time.Duration;
 
 public final class IdentityClient {
-    private static final Logger logger = LoggerFactory.getLogger(IdentityClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdentityClient.class);
     private final HttpAuthzProperties properties;
     private final RestTemplate restTemplate;
 
@@ -30,15 +30,19 @@ public final class IdentityClient {
         final String template = properties.getIdentityUrlTemplate();
         final String url = template.contains("{userId}") ? template.replace("{userId}", userId) : template;
         final HttpHeaders headers = new HttpHeaders();
+        final IdentityResponse identityResponse ;
         headers.add("Accept", properties.getAcceptHeader());
         headers.add(properties.getUserIdHeader(), userId);
         final RequestEntity<Void> request = RequestEntity.get(URI.create(url)).headers(headers).build();
         final ResponseEntity<LoggedInUserPermissionsResponse> response = restTemplate.exchange(request, LoggedInUserPermissionsResponse.class);
         final LoggedInUserPermissionsResponse body = response.getBody();
         if (body == null) {
-            logger.warn("Empty identity response for userId={}", userId);
-            return new IdentityResponse(userId, java.util.List.of(), java.util.List.of());
+            LOGGER.warn("Empty identity response for userId={}", userId);
+            identityResponse = new IdentityResponse(userId, java.util.List.of(), java.util.List.of());
         }
-        return new IdentityResponse(userId, body.groups(), body.permissions());
+        else {
+            identityResponse = new IdentityResponse(userId, body.groups(), body.permissions());
+        }
+        return identityResponse;
     }
 }

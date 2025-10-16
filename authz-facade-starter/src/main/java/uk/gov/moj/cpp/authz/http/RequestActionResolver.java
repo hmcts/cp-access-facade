@@ -33,7 +33,7 @@ public final class RequestActionResolver {
         final String accept = request.getHeader(ACCEPT);
         final String headerAction = actionHeaderName == null ? null : request.getHeader(actionHeaderName);
 
-        String resolvedName = null;
+        final String resolvedName;
         boolean vendorSupplied = false;
         boolean headerSupplied = false;
 
@@ -63,7 +63,7 @@ public final class RequestActionResolver {
             final Matcher matcher = VND_TOKEN_PATTERN.matcher(mediaTypeValue);
             if (matcher.find()) {
                 final String token = matcher.group(1);
-                result = (token == null) ? null : token.toLowerCase(Locale.ROOT);
+                result = (token == null) ? result : token.toLowerCase(Locale.ROOT);
             }
         }
         return result;

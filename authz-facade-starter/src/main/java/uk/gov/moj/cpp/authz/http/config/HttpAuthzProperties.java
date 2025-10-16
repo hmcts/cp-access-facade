@@ -17,7 +17,7 @@ public class HttpAuthzProperties {
     private String acceptHeader = "application/vnd.usersgroups.get-logged-in-user-permissions+json";
     private String droolsClasspathPattern = "classpath:/acl/**/*.drl";
     private boolean reloadOnEachRequest = true;
-    private boolean actionRequired = false;
+    private boolean actionRequired;
     private boolean denyWhenNoRules = true;
     private Map<String, String> groupAliases = new LinkedHashMap<>();
     private Integer filterOrder = Ordered.HIGHEST_PRECEDENCE + 30;

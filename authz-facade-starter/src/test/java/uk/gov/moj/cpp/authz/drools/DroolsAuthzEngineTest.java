@@ -16,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DroolsAuthzEngineTest {
 
+
+    private static final String DROOLS_CLASSPATH_PATTERN = "classpath:/drool-test/**/*.drl";
+
     @BeforeAll
     static void prepare() {
         System.setProperty("mvel2.disable.jit", "true");
@@ -27,7 +30,7 @@ class DroolsAuthzEngineTest {
     @Timeout(5)
     void allowsWhenRuleMatchesActionAndGroup() {
         final HttpAuthzProperties properties = new HttpAuthzProperties();
-        properties.setDroolsClasspathPattern("classpath:/drool-test/**/*.drl");
+        properties.setDroolsClasspathPattern(DROOLS_CLASSPATH_PATTERN);
         properties.setReloadOnEachRequest(false);
         properties.setDenyWhenNoRules(true);
         final DroolsAuthzEngine engine = new DroolsAuthzEngine(properties);
@@ -50,7 +53,7 @@ class DroolsAuthzEngineTest {
     @Timeout(5)
     void deniesWhenNoRuleMatches() {
         final HttpAuthzProperties properties = new HttpAuthzProperties();
-        properties.setDroolsClasspathPattern("classpath:/drool-test/**/*.drl");
+        properties.setDroolsClasspathPattern(DROOLS_CLASSPATH_PATTERN);
         properties.setReloadOnEachRequest(false);
         properties.setDenyWhenNoRules(true);
         final DroolsAuthzEngine engine = new DroolsAuthzEngine(properties);
@@ -64,7 +67,7 @@ class DroolsAuthzEngineTest {
     @Timeout(5)
     void allowsWhenVendorActionSjpDeleteFinancialMeansAndGroupIsLa() {
         final HttpAuthzProperties properties = new HttpAuthzProperties();
-        properties.setDroolsClasspathPattern("classpath:/drool-test/**/*.drl");
+        properties.setDroolsClasspathPattern(DROOLS_CLASSPATH_PATTERN);
         properties.setReloadOnEachRequest(false);
         properties.setDenyWhenNoRules(true);
         final DroolsAuthzEngine engine = new DroolsAuthzEngine(properties);
@@ -88,7 +91,7 @@ class DroolsAuthzEngineTest {
     @Timeout(5)
     void allowsWhenVendorActionHearingGetDraftResultAndGroupIsLa() {
         final HttpAuthzProperties properties = new HttpAuthzProperties();
-        properties.setDroolsClasspathPattern("classpath:/drool-test/**/*.drl");
+        properties.setDroolsClasspathPattern(DROOLS_CLASSPATH_PATTERN);
         properties.setReloadOnEachRequest(false);
         properties.setDenyWhenNoRules(true);
         final DroolsAuthzEngine engine = new DroolsAuthzEngine(properties);

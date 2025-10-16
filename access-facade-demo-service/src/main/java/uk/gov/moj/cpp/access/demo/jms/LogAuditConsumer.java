@@ -11,11 +11,13 @@ import uk.gov.moj.cpp.audit.model.HttpAuditEvent;
 @ConditionalOnProperty(prefix = "demo.audit", name = "log-consumer", havingValue = "true", matchIfMissing = false)
 public class LogAuditConsumer {
 
-    private static final Logger log = LoggerFactory.getLogger(LogAuditConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogAuditConsumer.class);
 
     @JmsListener(destination = "${audit.artemis.destination:jms.queue.audit}")
-    public void on(HttpAuditEvent event) {
-        log.info("AUDIT RECEIVED: method={} path={} status={} userId={} latency={}ms",
-                event.method(), event.path(), event.requestBody(), event.userId(), event.latencyMs());
+    public void onAuditEvent(final HttpAuditEvent event) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("AUDIT RECEIVED: method={} path={} status={} userId={} latency={}ms",
+                    event.method(), event.path(), event.requestBody(), event.userId(), event.latencyMs());
+        }
     }
 }

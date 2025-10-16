@@ -63,6 +63,12 @@ public final class DroolsAuthzEngine {
         return resource;
     }
 
+    private String readResourceContent(final Resource resource) throws IOException {
+        try (InputStream inputStream = resource.getInputStream()) {
+            return sanitize(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
+        }
+    }
+
     private synchronized void loadRules() throws IOException {
         final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         final Resource[] resources = resolver.getResources(properties.getDroolsClasspathPattern());
@@ -73,10 +79,7 @@ public final class DroolsAuthzEngine {
             if (fileName == null || fileName.isBlank()) {
                 fileName = "file" + (sequence++) + ".drl";
             }
-            final String content;
-            try (InputStream inputStream = resource.getInputStream()) {
-                content = sanitize(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
-            }
+            final String content = readResourceContent(resource);
             final String sourcePath = resolveSourcePath(content, fileName);
             loaded.add(new RuleAsset(content, sourcePath));
         }
