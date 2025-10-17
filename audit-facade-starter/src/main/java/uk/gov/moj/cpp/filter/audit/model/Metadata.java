@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import lombok.Builder;
 
+@SuppressWarnings("PMD.ShortVariable")
 @Builder
 public record Metadata(
         UUID id,

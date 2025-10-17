@@ -68,7 +68,8 @@ class ClasspathResourceLoaderTest {
     }
 
     @Configuration
-    static class TestConfig {
+    @SuppressWarnings("PMD.TestClassWithoutTestCases")
+    public static class TestConfig {
         @Bean
         public ClasspathResourceLoader classpathResourceLoader(final ResourceLoader resourceLoader) {
             return new ClasspathResourceLoader(resourceLoader);

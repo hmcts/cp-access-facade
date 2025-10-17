@@ -2,6 +2,7 @@ package uk.gov.moj.cpp.filter.audit.service;
 
 import java.util.Map;
 
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface PathParameterService {
     /**
      * Extracts path parameters from the given servlet path.

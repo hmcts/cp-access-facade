@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class AuditPayloadGenerationServiceTest {
 
     private static final String HEADER_ATTR_CJSCPPUID = "CJSCPPUID";
