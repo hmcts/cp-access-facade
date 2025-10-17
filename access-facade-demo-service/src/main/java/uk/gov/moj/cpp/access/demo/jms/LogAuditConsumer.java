@@ -13,7 +13,8 @@ public class LogAuditConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogAuditConsumer.class);
 
     @JmsListener(destination = "jms.topic.auditing.event")
-    public void onAuditEvent(final String message) {
+    @SuppressWarnings("PMD.ShortMethodName")
+    public void on(final String message) {
         LOGGER.info("Audit payload: {}", message);
     }
 }
