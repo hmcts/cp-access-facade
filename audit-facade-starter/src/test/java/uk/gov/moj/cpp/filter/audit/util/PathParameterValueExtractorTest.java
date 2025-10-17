@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class PathParameterValueExtractorTest {
 
     private final PathParameterValueExtractor extractor = new PathParameterValueExtractor();

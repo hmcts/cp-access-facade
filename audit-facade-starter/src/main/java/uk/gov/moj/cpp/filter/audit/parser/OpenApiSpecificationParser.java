@@ -50,7 +50,7 @@ public class OpenApiSpecificationParser implements RestApiParser {
             throw new IllegalArgumentException("No OpenAPI specification found at the specified path");
         }
 
-        OpenAPI openAPI;
+        final OpenAPI openAPI;
         try {
             final String specificationUrl = optionalResource.get().getURL().toString();
             openAPI = openAPIParser.readLocation(specificationUrl, null, null).getOpenAPI();
@@ -58,7 +58,7 @@ public class OpenApiSpecificationParser implements RestApiParser {
             throw new IllegalArgumentException("Unable to parse OpenAPI specification at location", e);
         }
 
-        final Paths paths = openAPI.getPaths();
+        final Paths paths = openAPI.getPaths();// NOPMD UseInterfaceType
         if (null == paths || paths.isEmpty()) {
             LOGGER.warn("Supplied specification has no endpoints defined: {}", restSpecification);
             throw new IllegalArgumentException("Supplied specification has no endpoints defined: " + restSpecification);

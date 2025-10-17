@@ -3,6 +3,7 @@ package uk.gov.moj.cpp.filter.audit.parser;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface RestApiParser {
 
     /**

@@ -30,6 +30,8 @@ class OpenApiSpecificationParserTest {
 
     private static final String CLASSPATH_OPENAPI_YAML = "classpath:/openapi.yaml";
     private static final String FILE_DUMMY_PATH = "file:/dummy/path";
+    private static final String API_RESOURCE_PATH = "/api/resource/{id}";
+    private static final String API_PATH = "path";
 
     @Test
     @DisplayName("Throws exception when OpenAPI specification path is null")
@@ -65,7 +67,7 @@ class OpenApiSpecificationParserTest {
         final Resource resource = mock(Resource.class);
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
         when(resource.getURL()).thenThrow(new IOException("IO error"));
-        OpenAPIParser openAPIParser = mock(OpenAPIParser.class);
+        final OpenAPIParser openAPIParser = mock(OpenAPIParser.class);
 
         final OpenApiSpecificationParser parser = new OpenApiSpecificationParser(resourceLoader, CLASSPATH_OPENAPI_YAML, openAPIParser);
 
@@ -105,11 +107,14 @@ class OpenApiSpecificationParserTest {
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
         when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
-        final Parameter pathParam = new Parameter().in("path").name("id");
+        final Parameter pathParam = new Parameter().in(API_PATH).name("id");
         final PathItem pathItem1 = new PathItem().parameters(List.of(pathParam));
         final PathItem pathItem2 = new PathItem().parameters(List.of(pathParam));
-        final Paths paths = new Paths();
-        paths.addPathItem("/api/resource/{id}", pathItem1);
+
+        @SuppressWarnings("PMD.UseInterfaceInsteadOfImplementation")
+        final Paths paths = new Paths();// NOPMD UseInterfaceType
+
+        paths.addPathItem(API_RESOURCE_PATH, pathItem1);
         paths.addPathItem("/api/other-resource/{id}", pathItem2);
 
         final OpenAPI openAPI = mock(OpenAPI.class);
@@ -124,9 +129,9 @@ class OpenApiSpecificationParserTest {
         parser.init();
 
         final Map<String, Pattern> patterns = parser.getPathPatterns();
-        assertThat(patterns).containsKey("/api/resource/{id}");
+        assertThat(patterns).containsKey(API_RESOURCE_PATH);
         assertThat(patterns).containsKey("/api/other-resource/{id}");
-        assertThat(patterns.get("/api/resource/{id}").pattern()).isEqualTo("/api/resource/([^/]+)");
+        assertThat(patterns.get(API_RESOURCE_PATH).pattern()).isEqualTo("/api/resource/([^/]+)");
         assertThat(patterns.get("/api/other-resource/{id}").pattern()).isEqualTo("/api/other-resource/([^/]+)");
     }
 
@@ -140,7 +145,7 @@ class OpenApiSpecificationParserTest {
 
         final Parameter queryParam = new Parameter().in("query").name("q");
         final PathItem pathItem = new PathItem().parameters(List.of(queryParam));
-        final Paths paths = new Paths();
+        final Paths paths = new Paths();// NOPMD UseInterfaceType
         paths.addPathItem("/api/resource", pathItem);
 
         final OpenAPI openAPI = mock(OpenAPI.class);
@@ -166,8 +171,8 @@ class OpenApiSpecificationParserTest {
         when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
         final PathItem pathItem = new PathItem().parameters(null);
-        final Paths paths = new Paths();
-        paths.addPathItem("/api/resource/{id}", pathItem);
+        final Paths paths = new Paths();// NOPMD UseInterfaceType
+        paths.addPathItem(API_RESOURCE_PATH, pathItem);
 
         final OpenAPI openAPI = mock(OpenAPI.class);
         when(openAPI.getPaths()).thenReturn(paths);
@@ -191,10 +196,10 @@ class OpenApiSpecificationParserTest {
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
         when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
-        final Parameter pathParam1 = new Parameter().in("path").name("id");
-        final Parameter pathParam2 = new Parameter().in("path").name("subId");
+        final Parameter pathParam1 = new Parameter().in(API_PATH).name("id");
+        final Parameter pathParam2 = new Parameter().in(API_PATH).name("subId");
         final PathItem pathItem = new PathItem().parameters(List.of(pathParam1, pathParam2));
-        final Paths paths = new Paths();
+        final Paths paths = new Paths();// NOPMD UseInterfaceType
         paths.addPathItem("/api/resource/{id}/sub-resource/{subId}", pathItem);
 
         final OpenAPI openAPI = mock(OpenAPI.class);
@@ -221,8 +226,8 @@ class OpenApiSpecificationParserTest {
         when(resourceLoader.loadFilesByPattern(anyString())).thenReturn(Optional.of(resource));
         when(resource.getURL()).thenReturn(new URL(FILE_DUMMY_PATH));
 
-        final Paths paths = new Paths();
-        paths.addPathItem("/api/resource/{id}", null);
+        final Paths paths = new Paths();// NOPMD UseInterfaceType
+        paths.addPathItem(API_RESOURCE_PATH, null);
 
         final OpenAPI openAPI = mock(OpenAPI.class);
         when(openAPI.getPaths()).thenReturn(paths);
@@ -249,8 +254,8 @@ class OpenApiSpecificationParserTest {
         final Parameter pathParam = new Parameter().in("path").name("id");
         final Parameter queryParam = new Parameter().in("query").name("q");
         final PathItem pathItem = new PathItem().parameters(List.of(pathParam, queryParam));
-        final Paths paths = new Paths();
-        paths.addPathItem("/api/resource/{id}", pathItem);
+        final Paths paths = new Paths();// NOPMD UseInterfaceType
+        paths.addPathItem(API_RESOURCE_PATH, pathItem);
 
         final OpenAPI openAPI = mock(OpenAPI.class);
         when(openAPI.getPaths()).thenReturn(paths);
@@ -264,8 +269,8 @@ class OpenApiSpecificationParserTest {
         parser.init();
 
         final Map<String, Pattern> patterns = parser.getPathPatterns();
-        assertThat(patterns).containsKey("/api/resource/{id}");
-        assertThat(patterns.get("/api/resource/{id}").pattern()).isEqualTo("/api/resource/([^/]+)");
+        assertThat(patterns).containsKey(API_RESOURCE_PATH);
+        assertThat(patterns.get(API_RESOURCE_PATH).pattern()).isEqualTo("/api/resource/([^/]+)");
     }
 }
 
