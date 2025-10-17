@@ -85,11 +85,38 @@ The filter also populates action **attributes**:
 
 ---
 
+## How audit works
+
+The demo app uses `audit-facade-starter` to publish audit events to an embedded Artemis broker. The starter provides:
+- `AuditFilter` – filter with highest priority that intercepts all REST requests and responses and generates an audit activity
+- `AuditService` – Publishes the audit payload to a JMS topic
+- `RestApiParser` - Interface definition for extracting details specific to path parameters for REST API calls.  Default implementation uses OpenAPI specification to get the required details.  See implementation `OpenApiSpecificationParser`
+
+
 ## Configuration (application.yml)
 
 The demo app ships with sensible defaults. To integrate elsewhere, add a section like this:
 
 ```yaml
+
+# Audit filter configuration
+
+spring:
+  artemis:
+    mode: native
+    broker-url: "tcp://localhost:61616"
+  jms:
+    pub-sub-domain: true
+    cache:
+      session-cache-size: 5
+      
+audit:
+  http:
+    enabled: true # Enable the audit filter
+    openapi-rest-spec: "sample.openapi.yml" #OpenAPI specification file name (anywhere in the classpath)
+
+# Auth filter configuration
+
 authz:
   http:
     enabled: true

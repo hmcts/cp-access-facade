@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: Access Facade Demo Service API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/hello:
+    get:
+      summary: Returns a hello message
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            default: world
+      responses:
+        '200':
+          description: Hello message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/echo:
+    post:
+      summary: Echoes back the posted body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Echoed body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: object
+  /api/error:
+    get:
+      summary: Returns a teapot error
+      responses:
+        '418':
+          description: Teapot error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /usersgroups-query-api/query/api/rest/usersgroups/users/logged-in-user/permissions:
+    get:
+      summary: Get permissions for the logged-in user
+      parameters:
+        - name: CJSCPPUID
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Permissions response
+          content:
+            application/vnd.usersgroups.get-logged-in-user-permissions+json:
+              schema:
+                $ref: '#/components/schemas/LoggedInUserPermissionsResponse'
+components:
+  schemas:
+    UserGroup:
+      type: object
+      properties:
+        groupId:
+          type: string
+        groupName:
+          type: string
+        prosecutingAuthority:
+          type: string
+          nullable: true
+    SwitchableRole:
+      type: object
+      properties:
+        roleId:
+          type: string
+        roleName:
+          type: string
+    UserPermission:
+      type: object
+      properties:
+        permissionId:
+          type: string
+        object:
+          type: string
+        action:
+          type: string
+        description:
+          type: string
+    LoggedInUserPermissionsResponse:
+      type: object
+      properties:
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserGroup'
+        switchableRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SwitchableRole'
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPermission'

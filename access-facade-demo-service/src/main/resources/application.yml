@@ -7,8 +7,10 @@ spring:
   artemis:
     mode: native
     broker-url: "tcp://localhost:61616"
-    user: artemis
-    password: artemis
+  jms:
+    pub-sub-domain: true
+    cache:
+      session-cache-size: 5
 
 management:
   endpoints:
@@ -38,18 +40,8 @@ authz:
 audit:
   http:
     enabled: true
-  artemis:
-    destination: jms.queue.audit
-    delivery-mode: PERSISTENT
-    priority: 4
-    time-to-live-ms: 0
+    openapi-rest-spec: "sample.openapi.yml"
 
 demo:
   audit:
     log-consumer: true
-
-
-logging:
-  level:
-    uk.gov.moj.cpp.auditdemo.jms: DEBUG
-    uk.gov.moj.cpp.audit.jms.ArtemisAuditPublisher: DEBUG
