@@ -12,7 +12,7 @@ dependencies {
     api 'io.micrometer:micrometer-core'
 
     api 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
-    api 'io.swagger.parser.v3:swagger-parser:2.1.20'
+    api 'io.swagger.parser.v3:swagger-parser:2.1.35'
 
     // --- Lombok for main and test code ---
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
