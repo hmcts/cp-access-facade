@@ -27,11 +27,11 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     // --- Drools / MVEL rule engine ---
-    implementation 'org.kie:kie-api:7.74.0.Final'
-    implementation 'org.drools:drools-core:7.74.0.Final'
-    implementation 'org.drools:drools-compiler:7.74.0.Final'
-    implementation 'org.drools:drools-mvel:7.74.0.Final'
-    implementation 'org.mvel:mvel2:2.5.0.Final'
+    implementation 'org.kie:kie-api:10.1.0'
+    implementation 'org.drools:drools-core:10.1.0'
+    implementation 'org.drools:drools-compiler:10.1.0'
+    implementation 'org.drools:drools-mvel:10.1.0'
+    implementation 'org.mvel:mvel2:2.5.2.Final'
 
     // --- Testing (JUnit 5) ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
